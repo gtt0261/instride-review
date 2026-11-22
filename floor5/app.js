@@ -522,5 +522,6 @@ function toggleMapPlayback(){
     if(old!==frame)drawFrame();if(frame===route.frames.length-1){stopMapPlayback();return;}mapClock=requestAnimationFrame(advance);
   }mapClock=requestAnimationFrame(advance);
 }
+$('chooseFolder').onclick=()=>$('folder').click();
 $('folder').addEventListener('change',async e=>{const input=e.target;input.disabled=true;try{const count=await readLocalFolder(input.files);selectRoute(route);$('folderStatus').textContent=count+' verified local files are ready.';}catch(err){$('folderStatus').textContent=err.message;}finally{input.value='';input.disabled=false;}});
 const wanted=new URL(location.href).searchParams.get('route');selectRoute(pack.routes.find(r=>r.code===wanted)||route);

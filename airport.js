@@ -13,8 +13,8 @@ function selectView(key) {
   selected = key;
   for (const b of document.querySelectorAll('[data-key]')) b.setAttribute('aria-pressed', String(b.dataset.key === key));
   const playing = key === 'clip', film = $('film');
-  film.pause(); film.hidden = !playing; $('hero').hidden = playing;
-  if (playing) { film.src = media.clip; film.poster = media.approach; }
+  film.pause(); film.hidden = !playing; $('hero').hidden = playing; $('filmControls').hidden=!playing;
+  if (playing) { film.src = media.clip; film.poster = media.approach;film.play().catch(()=>{}); }
   else { $('hero').src = media[key]; $('hero').alt = captions[key]; }
   $('caption').textContent = captions[key]; $('scores').replaceChildren();
   const scores = key === 'front' || key === 'reverse' ? ['H · In region','A · 0 to draft area', key === 'front' ? 'S · 9/9 target rays' : 'S · 0/9 target rays'] : ['31 observations','0 collision steps','Draft boundaries'];
@@ -25,6 +25,13 @@ function selectRef(key) {
   for (const b of document.querySelectorAll('[data-ref]')) b.setAttribute('aria-pressed', String(b.dataset.ref === key));
   $('refImage').src = media[key]; $('refImage').alt = refText[key]; $('refLabel').textContent = refText[key];
 }
+$('chooseAirport').onclick=()=>$('localMedia').click();
+const film=$('film');
+function filmClock(t){return Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');}
+function updateFilm(){const duration=Number.isFinite(film.duration)?film.duration:0;$('filmSeek').max=duration||1;$('filmSeek').value=film.currentTime;$('filmTime').textContent=filmClock(film.currentTime)+' / '+filmClock(duration);$('filmToggle').textContent=film.paused?'Play':'Pause';}
+for(const event of ['loadedmetadata','timeupdate','pause','play','ended'])film.addEventListener(event,updateFilm);
+$('filmToggle').onclick=()=>{if(film.paused)film.play().catch(()=>{$('caption').textContent='The video could not be played in this browser.';});else film.pause();updateFilm();};
+$('filmSeek').oninput=()=>{if(Number.isFinite(film.duration))film.currentTime=Number($('filmSeek').value);};
 function activateMedia(pack) {
   if (pack.schema !== 'instride-private-media-v1' || pack.scene !== 'airport-parcel' || !pack.content) throw Error('This file belongs to a different evidence pack.');
   for (const key of [...Object.keys(publicMedia), ...Object.keys(refText)]) {
