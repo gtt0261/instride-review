@@ -1,30 +1,40 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#123f35"><meta name="description" content="Review robot trajectories, stopping direction and memory evidence in the InStride research pilot.">
-<title>Airport parcel counter · InStride Review</title>
-<link rel="stylesheet" href="airport.css"><script defer src="case-data.js"></script><script defer src="share.js"></script><script defer src="airport.js"></script>
-</head><body>
-<header><div class="bar"><a class="brand" href="./"><span class="mark" aria-hidden="true">↗</span> InStride <span>Review</span></a><nav aria-label="Cases"><a href="./" aria-current="page">Airport pilot</a><a href="floor5/">Floor 5 routes</a></nav><button id="copy" type="button">Copy link</button></div></header>
-<main>
-<div class="heading"><p class="eyebrow">Airport parcel counter</p><h1>Stop at the FedEx box, facing its orange drop slot.</h1><p>A robot passes a pillar and turns toward one of four neighboring machines. Check where it stops and what it can see.</p></div>
+<meta name="theme-color" content="#184c3e"><meta name="description" content="Review an airport robot route, its turns and its final approach to a parcel drop box.">
+<title>Airport parcel run · InStride Review</title>
+<link rel="stylesheet" href="airport.css"><script defer src="share.js"></script><script defer src="airport.js"></script>
+</head><body><header><div class="bar"><a class="brand" href="./"><span class="mark" aria-hidden="true">↗</span> InStride <span>Review</span></a><button id="copy" type="button">Copy link</button></div></header>
+<main><div class="heading"><p class="eyebrow">Airport parcel counter · Human review pending</p><h1>Face the orange slot on the FedEx box.</h1>
+<p>The robot starts behind the baggage carousel and stops in front of the parcel counter.</p></div>
 <div class="layout"><div class="primary-col">
-<section class="panel evidence"><div class="section-head"><h2>First-person evidence</h2><span class="mode" id="mode">Instance geometry</span></div>
-<div class="tabs" id="views" role="group" aria-label="Camera evidence"><button data-key="approach" aria-pressed="true">Approach</button><button data-key="front" aria-pressed="false">Facing the slot</button><button data-key="reverse" aria-pressed="false">Turned 180°</button><button data-key="clip" aria-pressed="false">Play route</button></div>
-<figure><img id="hero" src="media/approach.jpg" alt="Robot view of the four parcel-counter machines"><video id="film" playsinline muted preload="metadata" aria-label="First-person simulated route" hidden></video><div class="film-controls" id="filmControls" hidden><button id="filmToggle" type="button">Play</button><input id="filmSeek" type="range" min="0" max="1" step="0.01" value="0" aria-label="Replay position in seconds"><output id="filmTime">0:00</output></div><figcaption id="caption"></figcaption></figure>
-<div class="scores" id="scores" aria-live="polite"></div>
+<section class="panel evidence"><div class="section-head"><h2>Robot camera</h2><span class="mode" id="mode">First-person RGB · 1080p</span></div>
+<div id="views" class="tabs" role="group" aria-label="Camera views">
+<button data-key="clip" aria-pressed="true">Full route</button><button data-key="start">Departure</button><button data-key="turn">Carousel turn</button>
+<button data-key="approach">Approach</button><button data-key="stop">Final stop</button><button data-key="reverse">Reverse check</button></div>
+<figure><video id="film" width="1920" height="1080" controls playsinline preload="metadata" poster="run/approach.jpg" aria-label="First-person route from the baggage carousel to the FedEx box"><source src="run/expert.mp4" type="video/mp4"></video>
+<img id="hero" width="3840" height="2160" hidden alt=""><figcaption id="caption">Play the full route to follow the turns and final alignment.</figcaption></figure>
+<div class="file-row"><span id="clock" class="mode">Frame 0</span><a id="original" href="run/expert.mp4" target="_blank" rel="noopener">Open original video</a></div>
 </section>
-<section class="panel"><div class="section-head"><h2>What did the robot see?</h2><span class="mode">Along-route memory</span></div>
-<p class="question">“Return to the lottery machine you passed.”</p><div class="pair"><figure><img id="seen" src="media/seen.jpg" alt="Lottery machine visible during the turn"><figcaption><b>Frame 24</b> · The lottery machine covers 22,834 of 57,600 pixels.</figcaption></figure><figure><img id="stop" src="media/stop.jpg" alt="Lottery machine out of view at the drop slot"><figcaption><b>Frame 30 · STOP</b> · The lottery machine covers 0 pixels.</figcaption></figure></div><p class="footnote">These frames establish when to ask the question. A memory score requires running an agent on the return task.</p>
+<section class="panel" id="memory" hidden><div class="section-head"><h2>Along-route memory</h2></div><p class="question">Which machine did you see earlier, outside the final view?</p>
+<div class="pair"><figure><a href="run/memory.jpg" target="_blank" rel="noopener"><img loading="lazy" src="run/memory.jpg" alt="Earlier view with the turquoise lottery machine"></a><figcaption id="earlier"></figcaption></figure>
+<figure><a href="run/stop.jpg" target="_blank" rel="noopener"><img loading="lazy" src="run/stop.jpg" alt="Final view facing the orange FedEx slot"></a><figcaption id="later"></figcaption></figure></div>
+<details><summary>Show the reference answer</summary><p>The turquoise lottery machine. The visibility check uses nine sight lines to its cabinet. This evidence supports a future memory test.</p></details>
 </section>
-<details class="panel"><summary>Load local RGB evidence</summary><p>Authorized collaborators can open their airport evidence file to examine textured robot views and original camera references on this device.</p><button type="button" id="chooseAirport">Choose evidence file</button><input hidden id="localMedia" type="file" accept=".json,application/json" aria-label="Airport evidence file"><p id="mediaStatus" class="footnote" role="status"></p><div id="reference" hidden><div class="tabs" role="group" aria-label="Capture reference"><button data-ref="source" aria-pressed="true">Capture 40</button><button data-ref="match" aria-pressed="false">Matched render</button><button data-ref="late" aria-pressed="false">Capture 96</button></div><img id="refImage" alt="Authorized source capture reference"><p id="refLabel" class="footnote"></p></div></details>
-</div><div class="secondary-col">
-<section class="panel"><div class="section-head"><h2>Approach area</h2><span class="mode">Top view</span></div><canvas id="map" width="610" height="445" aria-label="Plan view of the route around the pillar and editable rectangular approach area"></canvas>
+<details class="panel methods"><summary>Run evidence and source</summary><p id="checks"></p><p id="renderInfo"></p>
+<p>The airport reconstruction and approach area await human review. The physical scale is estimated at 0.80–0.95 m per scene unit. Fine signage inherits the resolution of the original capture.</p>
+<p><a href="run/trajectory.json">Executed poses and actions</a> · <a href="run/audit.json">Floor and visibility checks</a> · <a href="run/run.json">Render receipt</a></p>
+<p>Airport scene reconstructed from DL3DV. <a href="https://huggingface.co/datasets/DL3DV/DL3DV-GS-960P" rel="noreferrer">Source collection</a> · <a href="https://github.com/DL3DV-10K/Dataset/blob/main/License.md" rel="noreferrer">Source terms</a></p></details>
+</div><aside class="secondary-col">
+<section class="panel"><div class="section-head"><h2>Where the robot goes</h2><span class="mode">Top view</span></div>
+<div class="tabs" role="group" aria-label="Map detail"><button id="wide" aria-pressed="true">Entire route</button><button id="close" aria-pressed="false">Stop area</button></div>
+<canvas id="map" width="880" height="640" role="img" aria-label="Top view with the route, current position, heading and draft approach area"></canvas>
 <div class="legend"><span><i class="route"></i>Executed path</span><span><i class="zone"></i>Task region</span><span><i class="area"></i>Draft approach area</span></div>
 <div class="review-tools"><button id="pick" aria-pressed="false">Draw two corners</button><button id="restore">Reset area</button></div>
-<details><summary>Edit coordinates</summary><div class="coords"><label>Min X<input id="x0" type="number" step="0.01"></label><label>Min Y<input id="y0" type="number" step="0.01"></label><label>Max X<input id="x1" type="number" step="0.01"></label><label>Max Y<input id="y1" type="number" step="0.01"></label></div><button id="apply">Preview area</button><p class="footnote">Coordinates use local reconstruction units.</p></details><p id="mapStatus" class="footnote" role="status"></p></section>
-<section class="panel"><h2>Review this stop</h2><label>Reviewer alias<input id="who" placeholder="Name or initials" maxlength="40" autocomplete="off"></label><label>Decision<select id="decision"><option value="pending">Select a decision</option><option value="accept">Accept proposed area</option><option value="revise">Request a revision</option><option value="insufficient_evidence">Insufficient evidence</option></select></label><label>Review notes<textarea id="note" rows="2" maxlength="2000" placeholder="What supports your decision?"></textarea></label><button class="action" id="save">Export review JSON</button><p id="msg" class="footnote" role="status">Share the exported file with the review lead.</p></section>
-</div></div>
-<details class="panel methods"><summary>How this case was checked</summary><p>A collision-checked cylinder executed 30 actions and produced 31 aligned RGB, depth and instance observations. Floor support was sampled at 245 positions. A forward motion into the cabinet was blocked. The path covers 4.44 reconstruction units. The estimated scale gives 3.55–4.22 m. Physical scale and the human-drawn boundaries still need independent validation.</p><p>The draft measures region entry (H), shortest walkable distance from the stop to an allowed approach area (A, within 3 m), and a final pose within 2 m facing the visible task part (S). Facing and reverse controls use the same base position and the original candidate area.</p><p>Public frames color each object instance and shade it by measured depth. Synchronized local evidence adds the full RGB view.</p><p class="footnote">Source collection: <a href="https://huggingface.co/datasets/DL3DV/DL3DV-GS-960P" rel="noreferrer">DL3DV-GS-960P</a> · <a href="https://github.com/DL3DV-10K/Dataset/blob/main/License.md" rel="noreferrer">Dataset terms</a></p></details>
-</main><footer>InStride · Trajectory review</footer><p id="shareMsg" role="status" aria-live="polite" hidden></p>
-</body></html>
+<details><summary>Edit coordinates</summary><div class="coords"><label>Min X<input id="x0" type="number" step="0.01"></label><label>Min Y<input id="y0" type="number" step="0.01"></label><label>Max X<input id="x1" type="number" step="0.01"></label><label>Max Y<input id="y1" type="number" step="0.01"></label></div>
+<button id="apply">Preview area</button><p class="footnote">Coordinates are in scene units.</p></details><p id="mapStatus" class="footnote" role="status"></p></section>
+<section class="panel"><h2>Review this stop</h2><label>Reviewer alias<input id="who" placeholder="Name or initials" maxlength="40" autocomplete="off"></label>
+<label>Decision<select id="decision"><option value="pending">Select a decision</option><option value="accept">Accept proposed stop</option><option value="revise">Request a revision</option><option value="insufficient_evidence">Insufficient evidence</option></select></label>
+<label>Review notes<textarea id="note" rows="2" maxlength="2000" placeholder="What supports your decision?"></textarea></label>
+<button class="action" id="save">Export review JSON</button><p id="msg" class="footnote" role="status">Export your review to share it with the team.</p></section>
+</aside></div></main><footer>InStride · Airport trajectory review</footer><p id="shareMsg" role="status" aria-live="polite" hidden></p></body></html>

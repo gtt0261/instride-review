@@ -1,107 +1,122 @@
-'use strict';
-const C = window.InStrideCase, $ = id => document.getElementById(id);
-const publicMedia = {approach:'media/approach.jpg', front:'media/front.jpg', reverse:'media/reverse.jpg', seen:'media/seen.jpg', stop:'media/stop.jpg', clip:'media/approach.mp4'};
-let media = publicMedia, selected = 'approach', draft = [...C.area], picking = false, first;
-const captions = {
-  approach:'Frame 9. The robot has cleared the pillar and turns toward the bank of machines.',
-  front:'Same stop, facing the drawer. All nine sampled sight lines hit the orange drawer first.',
-  reverse:'Same stop, turned 180°. All nine sampled points on the drawer are outside the camera view.',
-  clip:'31 robot observations played at three actions per second. The approach ends with an in-place turn and STOP.'
-};
-const refText = {source:'Source camera, frame 40. From left to right: lottery, USPS, FedEx and UPS.', match:'Reconstructed meshes rendered from the same camera as source frame 40.', late:'Source camera, frame 96. The lottery machine now occludes the FedEx slot.'};
-function selectView(key) {
-  selected = key;
-  for (const b of document.querySelectorAll('[data-key]')) b.setAttribute('aria-pressed', String(b.dataset.key === key));
-  const playing = key === 'clip', film = $('film');
-  film.pause(); film.hidden = !playing; $('hero').hidden = playing; $('filmControls').hidden=!playing;
-  if (playing) { film.src = media.clip; film.poster = media.approach;film.play().catch(()=>{}); }
-  else { $('hero').src = media[key]; $('hero').alt = captions[key]; }
-  $('caption').textContent = captions[key]; $('scores').replaceChildren();
-  const scores = key === 'front' || key === 'reverse' ? ['H · In region','A · 0 to draft area', key === 'front' ? 'S · 9/9 target rays' : 'S · 0/9 target rays'] : ['31 observations','0 collision steps','Draft boundaries'];
-  for (const text of scores) { const s = document.createElement('span'); s.textContent = text; if (text.includes('0/9')) s.className = 'no'; $('scores').append(s); }
-  draw();
+const $ = id => document.getElementById(id);
+async function json(name) {
+  const response = await fetch('run/' + name + '.json');
+  if (!response.ok) throw Error(response.statusText);
+  return response.json();
 }
-function selectRef(key) {
-  for (const b of document.querySelectorAll('[data-ref]')) b.setAttribute('aria-pressed', String(b.dataset.ref === key));
-  $('refImage').src = media[key]; $('refImage').alt = refText[key]; $('refLabel').textContent = refText[key];
-}
-$('chooseAirport').onclick=()=>$('localMedia').click();
-const film=$('film');
-function filmClock(t){return Math.floor(t/60)+':'+String(Math.floor(t%60)).padStart(2,'0');}
-function updateFilm(){const duration=Number.isFinite(film.duration)?film.duration:0;$('filmSeek').max=duration||1;$('filmSeek').value=film.currentTime;$('filmTime').textContent=filmClock(film.currentTime)+' / '+filmClock(duration);$('filmToggle').textContent=film.paused?'Play':'Pause';}
-for(const event of ['loadedmetadata','timeupdate','pause','play','ended'])film.addEventListener(event,updateFilm);
-$('filmToggle').onclick=()=>{if(film.paused)film.play().catch(()=>{$('caption').textContent='The video could not be played in this browser.';});else film.pause();updateFilm();};
-$('filmSeek').oninput=()=>{if(Number.isFinite(film.duration))film.currentTime=Number($('filmSeek').value);};
-function activateMedia(pack) {
-  if (pack.schema !== 'instride-private-media-v1' || pack.scene !== 'airport-parcel' || !pack.content) throw Error('This file belongs to a different evidence pack.');
-  for (const key of [...Object.keys(publicMedia), ...Object.keys(refText)]) {
-    const val = pack.content[key], prefix = key === 'clip' ? 'data:video/mp4;base64,' : 'data:image/jpeg;base64,';
-    if (typeof val !== 'string' || !val.startsWith(prefix) || val.length < 100) throw Error('The evidence pack has an invalid ' + key + ' asset.');
+async function ready() {
+  const [route, audit] = await Promise.all([json('trajectory'), json('audit')]);
+  const frames = route.frames, keys = audit.keys, film = $('film'), canvas = $('map'), ctx = canvas.getContext('2d');
+  const closeBounds = [-4.15,-.9,3.35,5.90];
+  const points = route.waypoints;
+  const wideBounds = [Math.min(...points.map(p=>p[0]))-4,Math.min(...points.map(p=>p[1]))-2.6,
+                      Math.max(...points.map(p=>p[0]))+3.7,Math.max(...points.map(p=>p[1]))+4.5];
+  const titles = {clip:'Play the full route to follow the turns and final alignment.', start:'Departure from behind the baggage carousel.',
+    turn:'The robot rounds the end of the carousel.', approach:'The parcel counter is ahead, beyond the column.',
+    stop:'The robot has stopped facing the FedEx drop slot.',reverse:'Comparison at the same stop with the camera turned 180°. This view is outside the executed route.'};
+  let selected = 'clip', current = 0, close = false, picking = false, first = null, area = route.area.slice();
+  const fields=['x0','y0','x1','y1'];
+  const fill=()=>fields.forEach((id,i)=>$(id).value=area[i].toFixed(2));
+  function projection() {
+    const b=close?closeBounds:wideBounds;
+    const w=canvas.width,h=canvas.height,pad=28;
+    const scale=Math.min((w-2*pad)/(b[2]-b[0]),(h-2*pad)/(b[3]-b[1]));
+    const left=(w-scale*(b[2]-b[0]))/2, top=(h-scale*(b[3]-b[1]))/2;
+    return {b,scale,left,top,xy:(x,y)=>[left+(x-b[0])*scale,top+(b[3]-y)*scale]};
   }
-  media = pack.content; $('mode').textContent = 'Local RGB'; $('seen').src = media.seen; $('stop').src = media.stop;
-  $('reference').hidden = false; selectRef('source'); selectView(selected);
-  $('mediaStatus').textContent = 'RGB and capture references are open on this device.';
+  function draw() {
+    const {b,scale,left,top,xy}=projection();
+    ctx.clearRect(0,0,canvas.width,canvas.height);ctx.save();ctx.beginPath();
+    ctx.rect(left,top,(b[2]-b[0])*scale,(b[3]-b[1])*scale);ctx.clip();
+    function rect(r,fill,stroke) {
+      if(r[0]>b[2]||r[2]<b[0]||r[1]>b[3]||r[3]<b[1])return;
+      const [x,y]=xy(r[0],r[3]),w=(r[2]-r[0])*scale,h=(r[3]-r[1])*scale;
+      ctx.fillStyle=fill;ctx.fillRect(x,y,w,h);ctx.strokeStyle=stroke;ctx.lineWidth=1.3;ctx.strokeRect(x,y,w,h);
+    }
+    const gap=close?1:4;
+    for(let v=Math.ceil(b[0]/gap)*gap;v<b[2];v+=gap)rect([v,b[1],v,b[3]],'transparent','#d5dfd4');
+    for(let v=Math.ceil(b[1]/gap)*gap;v<b[3];v+=gap)rect([b[0],v,b[2],v],'transparent','#d5dfd4');
+    rect(route.zone,'#dcead3','#8ba682');
+    for(const solid of route.map_solids) rect(solid.rect,'#b1bbb0','#929e94');
+    rect(route.area,'#82b9a2aa','#266248');
+    if(area.some((v,i)=>v!==route.area[i]))rect(area,'#f4ad7788','#a85d2d');
+    ctx.lineWidth=5;ctx.lineJoin='round';ctx.lineCap='round';ctx.strokeStyle='#296c55';
+    ctx.beginPath();points.forEach(([x,y],i)=>{const p=xy(x,y);if(i)ctx.lineTo(...p);else ctx.moveTo(...p);});ctx.stroke();
+    function dot(x,y,r,c){ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,r,0,2*Math.PI);ctx.fill();}
+    dot(...xy(...points[0]),7,'#296c55');dot(...xy(...route.stop),7,'#296c55');
+    ctx.font='600 23px system-ui';ctx.fillStyle='#263e32';ctx.textAlign='center';
+    const callouts=close?[[-2.56,5.12,'Lottery'],[-1.51,5.12,'USPS'],[-.44,5.12,'FedEx'],[.78,5.12,'UPS']]:
+                         [[points[0][0],points[0][1]-.95,'Start'],[-18.9,-12.3,'Carousel'],[route.stop[0]-.1,5.55,'Parcel counter']];
+    for(const [x,y,label] of callouts){ctx.fillStyle='#263e32';ctx.fillText(label,...xy(x,y));}
+    const f=frames[current],p=xy(f[1],f[2]);
+    ctx.save();ctx.translate(...p);ctx.rotate(-(f[3]+(selected==='reverse'?180:0))*Math.PI/180);
+    ctx.beginPath();ctx.moveTo(17,0);ctx.lineTo(-10,-9);ctx.lineTo(-6,0);ctx.lineTo(-10,9);ctx.closePath();
+    ctx.fillStyle='#cd651f';ctx.strokeStyle='#fff';ctx.lineWidth=2;ctx.fill();ctx.stroke();ctx.restore();
+    if(first)dot(...xy(...first),7,'#a25420');ctx.restore();
+  }
+  function update() {
+    $('clock').textContent='Frame '+current+' / '+(frames.length-1)+' · '+(current/route.fps).toFixed(1)+' s';
+    draw();
+  }
+  function mapDetail(zoom){close=zoom;$('close').setAttribute('aria-pressed',String(close));$('wide').setAttribute('aria-pressed',String(!close));draw();}
+  function cancelPick(){picking=false;first=null;$('pick').setAttribute('aria-pressed','false');}
+  $('wide').onclick=()=>{cancelPick();mapDetail(false);};$('close').onclick=()=>mapDetail(true);
+  function select(key){
+    selected=key;film.pause();
+    document.querySelectorAll('[data-key]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.key===key)));
+    const clip=key==='clip';film.hidden=!clip;$('hero').hidden=clip;
+    if(clip)current=Math.min(frames.length-1,Math.round((film.currentTime||0)*route.fps));
+    else {current=keys[key==='reverse'?'stop':key];$('hero').src='run/'+key+'.jpg';$('hero').alt=titles[key];}
+    $('original').textContent=clip?'Open original video':'Open 4K image';
+    $('original').href=clip?'run/expert.mp4':'run/'+key+'.jpg';
+    $('caption').textContent=titles[key];$('mode').textContent=clip?'First-person RGB · 1080p':'Native RGB · 3840 × 2160';
+    cancelPick();mapDetail(['stop','reverse','approach'].includes(key));update();
+  }
+  document.querySelectorAll('[data-key]').forEach(b=>b.onclick=()=>select(b.dataset.key));
+  for(const ev of ['timeupdate','seeked','ended'])film.addEventListener(ev,()=>{
+    if(selected==='clip'){current=Math.min(frames.length-1,Math.round(film.currentTime*route.fps));update();}
+  });
+  film.addEventListener('error',()=>{$('caption').textContent='The video could not be played. Open the original video or inspect a 4K frame.';});
+  function readArea(){
+    const r=fields.map(id=>$(id).valueAsNumber);
+    if(!r.every(Number.isFinite)||r[0]<closeBounds[0]||r[1]<closeBounds[1]||r[2]>closeBounds[2]||r[3]>closeBounds[3]||r[2]-r[0]<.05||r[3]-r[1]<.05){
+      $('mapStatus').textContent='Choose a rectangle inside the stop map with min values below max values.';return null;
+    }return r;
+  }
+  $('pick').onclick=()=>{if(picking){cancelPick();draw();return;}mapDetail(true);picking=true;first=null;$('pick').setAttribute('aria-pressed','true');$('mapStatus').textContent='Choose the first corner on the stop map.';};
+  canvas.onclick=e=>{
+    if(!picking)return;const {b,scale,left,top}=projection(),r=canvas.getBoundingClientRect();
+    const x=b[0]+((e.clientX-r.left)*canvas.width/r.width-left)/scale,y=b[3]-((e.clientY-r.top)*canvas.height/r.height-top)/scale;
+    if(x<b[0]||x>b[2]||y<b[1]||y>b[3])return;
+    if(!first){first=[x,y];$('mapStatus').textContent='Choose the opposite corner.';draw();return;}
+    const rect=[Math.min(first[0],x),Math.min(first[1],y),Math.max(first[0],x),Math.max(first[1],y)].map(v=>+v.toFixed(2));
+    if(rect[2]-rect[0]<.05||rect[3]-rect[1]<.05){$('mapStatus').textContent='Choose two distinct corners.';return;}
+    area=rect;cancelPick();fill();draw();$('mapStatus').textContent='Proposed area updated.';
+  };
+  $('restore').onclick=()=>{area=route.area.slice();cancelPick();fill();mapDetail(true);$('mapStatus').textContent='Original draft area restored.';};
+  $('apply').onclick=()=>{const r=readArea();if(r){area=r;cancelPick();mapDetail(true);$('mapStatus').textContent='Proposed area updated.';}};
+  $('save').onclick=()=>{
+    const reviewer=$('who').value.trim(),decision=$('decision').value,notes=$('note').value.trim(),r=readArea();
+    if(!reviewer||decision==='pending'){ $('msg').textContent='Enter a reviewer alias and select a decision.';return; }
+    if(decision!=='accept'&&!notes){$('msg').textContent='Add a note explaining the decision.';return;}
+    if(!r||picking){$('msg').textContent='Complete the rectangle before exporting.';return;}
+    const record={schema:'instride-airport-review/2',route_id:route.id,scene_sha256:route.scene_sha256,target_part:route.target_part,
+      instruction:route.instruction,initial_area:route.area,proposed_area:r,coordinates:'Blender XY, scene units',
+      reviewer,decision,notes,view:selected,frame:current,time_utc:new Date().toISOString()};
+    const url=URL.createObjectURL(new Blob([JSON.stringify(record,null,2)],{type:'application/json'}));
+    const a=document.createElement('a');a.href=url;a.download='airport-stop-review.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),2500);
+    $('msg').textContent='Review exported.';
+  };
+  if('memory' in keys){
+    $('memory').hidden=false;
+    $('earlier').textContent='Frame '+keys.memory+' · '+audit.visibility[keys.memory][1]+'/9 sight lines reach the lottery machine.';
+    $('later').textContent='Frame '+keys.stop+' · '+audit.lottery_at_stop+'/9 sight lines reach it at the final stop.';
+  }
+  $('checks').textContent=route.states.length+' executed actions, '+frames.length+' camera frames and '+route.clearance_collision_events+' collisions. '
+    +audit.floor_hits+' of '+audit.floor_probes+' floor probes found support. The cylinder also stopped on a separate test motion into the cabinet.';
+  $('renderInfo').textContent='The route covers '+route.length_u.toFixed(2)+' scene units (estimated '+route.length_m_range.map(n=>n.toFixed(1)).join('–')+
+    ' m). At the final stop, '+audit.target_at_stop+'/9 sight lines hit the orange drawer. Turning 180° at the same spot gives '+audit.target_reversed+
+    '/9. Native rendering used '+audit.device+' with Blender Cycles '+audit.backend+'.';
+  fill();select('clip');
 }
-$('localMedia').addEventListener('change', async e => {
-  const file = e.target.files[0]; if (!file) return;
-  try {
-    if (file.size > 5*1024*1024) throw Error('Select the airport evidence JSON file (under 5 MB).');
-    const bytes = await file.arrayBuffer();
-    const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map(b => b.toString(16).padStart(2,'0')).join('');
-    if (hash !== 'bdcca8abeab509b1b4f927417a9c81ceedd85a0b1c77e316891806d390e84379') throw Error('This file does not match the verified airport evidence pack.');
-    activateMedia(JSON.parse(new TextDecoder().decode(bytes)));
-  } catch (error) { $('mediaStatus').textContent = error.message; }
-  e.target.value = '';
-});
-const canvas = $('map'), ctx = canvas.getContext('2d'), bounds = [-3.9,-.45,3.15,5.55], padding = 14;
-const scale = Math.min((canvas.width-2*padding)/(bounds[2]-bounds[0]),(canvas.height-2*padding)/(bounds[3]-bounds[1]));
-const left = (canvas.width-(bounds[2]-bounds[0])*scale)/2, topEdge = (canvas.height-(bounds[3]-bounds[1])*scale)/2;
-const screen = (x,y) => [left+(x-bounds[0])*scale,topEdge+(bounds[3]-y)*scale];
-function rect(r, fill, stroke) {
-  const [x,y] = screen(r[0],r[3]), w=(r[2]-r[0])*scale, h=(r[3]-r[1])*scale;
-  ctx.fillStyle=fill;ctx.fillRect(x,y,w,h);ctx.strokeStyle=stroke;ctx.lineWidth=1.4;ctx.strokeRect(x,y,w,h);
-}
-function draw() {
-  ctx.clearRect(0,0,canvas.width,canvas.height);ctx.save();ctx.beginPath();ctx.rect(left,topEdge,(bounds[2]-bounds[0])*scale,(bounds[3]-bounds[1])*scale);ctx.clip();
-  for (let x=-3;x<=3;x++) rect([x,bounds[1],x,bounds[3]],'#0000','#e0e5d9');
-  for (let y=0;y<=5;y++) rect([bounds[0],y,bounds[2],y],'#0000','#e0e5d9');
-  rect(C.zone,'#e0ecd9aa','#90b18d');
-  for (const ob of C.obstacles) rect(ob.rect, '#a9b6aa','#839489');
-  rect(C.area,'#76ba9e88','#216950'); if (draft.some((v,i)=>Math.abs(v-C.area[i])>.001)) rect(draft,'#f6b36a77','#ab5d23');
-  ctx.lineJoin='round';ctx.strokeStyle='#1b7055';ctx.lineWidth=4;ctx.beginPath();C.poses.forEach(([x,y],i)=>{const p=screen(x,y);if(i)ctx.lineTo(...p);else ctx.moveTo(...p);});ctx.stroke();
-  const [x,y]=screen(...C.stop);ctx.beginPath();ctx.arc(x,y,C.radius_u*scale,0,2*Math.PI);ctx.fillStyle='#45846449';ctx.fill();ctx.strokeStyle='#1e684e';ctx.lineWidth=2;ctx.stroke();
-  const s=selected==='reverse'?1:-1;ctx.beginPath();ctx.moveTo(x,y+s*36);ctx.lineTo(x-6,y+s*21);ctx.lineTo(x+6,y+s*21);ctx.closePath();ctx.fillStyle='#15553e';ctx.fill();
-  const a=screen(...C.path[0]);ctx.fillStyle='#1e684e';ctx.beginPath();ctx.arc(...a,5,0,Math.PI*2);ctx.fill();
-  ctx.font='600 16px Segoe UI, sans-serif';ctx.fillStyle='#243d2d';for(const [x0,y0,t] of [[-3.15,5.22,'Lottery'],[-1.67,5.22,'USPS'],[-.85,5.22,'FedEx'],[.34,5.22,'UPS'],[1.14,.56,'Pillar'],[2.38,.13,'Start']])ctx.fillText(t,...screen(x0,y0));
-  if(first){ctx.fillStyle='#ad571c';ctx.beginPath();ctx.arc(...screen(...first),5,0,Math.PI*2);ctx.fill();}ctx.restore();
-}
-const coords=['x0','y0','x1','y1'];
-function fill() {coords.forEach((id,i)=>$(id).value=draft[i].toFixed(2));}
-function readRect() {
-  const r = coords.map(id=>$(id).valueAsNumber);
-  if(!r.every(Number.isFinite)||r[0]<bounds[0]||r[1]<bounds[1]||r[2]>bounds[2]||r[3]>bounds[3]||r[2]-r[0]<.05||r[3]-r[1]<.05) { $('mapStatus').textContent = 'Enter a rectangle inside the map with min values below max values.'; return null; } return r;
-}
-function stopPick() { picking=false; first=null; $('pick').setAttribute('aria-pressed','false'); }
-$('pick').onclick=()=>{picking=true;first=null;$('pick').setAttribute('aria-pressed','true');$('mapStatus').textContent='Select the first corner on the map.';draw();};
-canvas.onclick=e=>{
-  if(!picking)return;const box=canvas.getBoundingClientRect(), x=bounds[0]+((e.clientX-box.left)*canvas.width/box.width-left)/scale, y=bounds[3]-((e.clientY-box.top)*canvas.height/box.height-topEdge)/scale;
-  if(x<bounds[0]||x>bounds[2]||y<bounds[1]||y>bounds[3]) return;
-  if(!first){first=[x,y];$('mapStatus').textContent='Select the opposite corner.';draw();return;}
-  const r=[Math.min(first[0],x),Math.min(first[1],y),Math.max(first[0],x),Math.max(first[1],y)].map(v=>Math.round(v*100)/100);
-  if(r[2]-r[0]<.05||r[3]-r[1]<.05){$('mapStatus').textContent='Choose two distinct corners.';return;}
-  draft=r;stopPick();fill();draw();$('mapStatus').textContent='Orange shows your proposed area. Collision and distance need rechecking.';
-};
-$('apply').onclick=()=>{const r=readRect();if(r){draft=r;stopPick();draw();$('mapStatus').textContent='Area preview updated. Target-ray results refer to the original stop.';}};
-$('restore').onclick=()=>{draft=[...C.area];stopPick();fill();draw();$('mapStatus').textContent='Original candidate area restored.';};
-$('save').onclick=()=>{
-  const reviewer=$('who').value.trim(),decision=$('decision').value,notes=$('note').value.trim();
-  if(!reviewer||decision==='pending'){ $('msg').textContent='Enter a reviewer alias and choose a decision.';return; }
-  if(decision!=='accept'&&!notes){ $('msg').textContent='Add a note explaining the revision or missing evidence.';return; }
-  const r=readRect();if(!r||picking){$('msg').textContent='Finish the rectangle or reset the area before export.';return;}
-  draft=r;draw();const now=new Date();
-  const record={schema:'instride-approach-review/1',scene_id:C.source_id,asset_sha256:C.source_version,instruction:C.instruction,target_part:'FedEx | hinged orange drawer',coordinate_system:'local XY in reconstruction units',initial_area:C.area,proposed_area:r,reviewer,decision,notes,reviewed_view:selected,media:media===publicMedia?'instance_geometry':'local_rgb',validation_status:'human_proposal_pending_validation',time_utc:now.toISOString()};
-  const url=URL.createObjectURL(new Blob([JSON.stringify(record,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='airport-fedex-review-'+now.toISOString().replace(/[:.]/g,'-')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);$('msg').textContent='Review exported. Share the JSON file with the review lead.';
-};
-for(const b of document.querySelectorAll('[data-key]')) b.onclick=()=>selectView(b.dataset.key);
-for(const b of document.querySelectorAll('[data-ref]')) b.onclick=()=>selectRef(b.dataset.ref);
-fill();selectView('approach');if(window.InStridePrivate)activateMedia(window.InStridePrivate);
+ready().catch(()=>{$('mapStatus').textContent='Route data could not be loaded. Refresh the page to retry.';});

@@ -1,0 +1,37 @@
+{
+  "status": "pending_human_review",
+  "device": "NVIDIA RTX PRO 5000 72GB Blackwell",
+  "single_gpu": true,
+  "render_process_verified": true,
+  "backend": "Blender Cycles OptiX",
+  "peak_memory_mib": 9528,
+  "peak_utilization_percent": 100,
+  "video": {
+    "codec_name": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "24/1",
+    "duration": "30.083333",
+    "nb_frames": "722"
+  },
+  "video_bytes": 16703953,
+  "sha256": "8199c2c73be4fc0e675db679e74f21e9e2f7ead91c563c20ae2dd67e13cd3bde",
+  "source": "DL3DV airport parcel counter reconstruction",
+  "synchronized_observations": {
+    "frames": 722,
+    "width": 640,
+    "height": 360,
+    "depth_encoding": "uint16 axial millimetres at provisional 0.80 m/u; zero means no hit",
+    "raycast_reference_probes": 51,
+    "max_probe_error_mm": 0,
+    "stop_drawer_pixels": 33188
+  },
+  "decoded_video_frames": 722,
+  "keyframe_rgb_mean_abs_difference_8bit": {
+    "start": 1.57,
+    "turn": 1.47,
+    "memory": 1.42,
+    "approach": 1.44,
+    "stop": 1.35
+  }
+}
