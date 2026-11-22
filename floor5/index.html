@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Floor 5 routes · InStride Review</title><link href="style.css" rel="stylesheet"/>
+<script defer="" src="data.js"></script><script defer="" src="../share.js"></script><script defer="" src="public-media.js"></script><script defer="" src="app.js"></script>
+</head>
+<body data-page="floor5">
+<header class="mast"><a aria-label="Airport pilot, InStride home" class="home-link" href="../"><div class="brand"><span aria-hidden="true" class="brandmark"><i></i><b></b></span>InStride Review</div></a>
+<nav aria-label="Cases" class="case-links"><a href="../">Airport pilot</a><a aria-current="page" href="./">Floor 5 routes</a></nav><div class="mast-tools"><label class="who">Reviewer <input autocomplete="off" id="reviewer" maxlength="40" placeholder="Name or initials"/></label>
+<button id="copy" type="button">Copy link</button><button id="importBtn">Import reviews</button><button id="exportMine">Export my reviews</button><input accept=".json,application/json" hidden="" id="fileIn" multiple="" type="file"/></div>
+</header>
+<p class="notice" hidden="" id="storageWarning"></p>
+<div class="layout">
+<aside aria-label="Route list" class="queue">
+<h2>Route queue</h2><p class="muted" id="packTitle"></p>
+<select aria-label="Filter routes" id="filter"><option value="all">All routes</option><option value="todo">My open routes</option><option value="conflict">Disputed</option></select>
+<nav id="routeList"></nav><div class="progress-block"><div class="between"><span>My progress</span><strong id="progressCount">0 / 2</strong></div><progress id="progress" max="2" value="0"></progress></div>
+<button class="ledger-btn" id="openSummary">Review summary <span aria-hidden="true">↗</span></button>
+</aside>
+<main>
+<div class="route-head"><p class="crumb" id="context"></p><h1 id="instruction"></h1><p class="facts" id="facts"></p>
+<details class="source-details"><summary>Task and source annotation</summary><p id="sourceInfo"></p></details></div>
+<details class="local-evidence"><summary>Open original RGB and depth on this device</summary><p>The public view includes the executed route, stop heading and depth diagrams. If you have the original Floor 5 media folder, select it to inspect the camera images and pin their pixels.</p><label>Local media folder <input id="folder" multiple="" type="file" webkitdirectory=""/></label><p id="folderStatus" role="status"></p></details><div aria-label="Evidence views" class="tabs" role="group"><button aria-pressed="true" class="selected" data-tab="play">Route replay</button><button aria-pressed="false" data-tab="stop">Stop inspection</button><button aria-pressed="false" data-tab="memory">Along-route memory</button></div>
+<section class="panel" id="playPanel">
+<div class="film"><canvas aria-label="Recorded trajectory plotted relative to its stop" height="385" id="publicMap" width="800"></canvas><video aria-label="First-person robot replay" id="movie" muted="" playsinline="" preload="metadata"></video><span class="frame-tag" id="frameTag"></span></div>
+<div class="transport"><input aria-label="Scrub recorded frames" id="scrub" max="1" min="0" type="range" value="0"/>
+<div class="transport-row"><button aria-label="Previous frame" id="prev" title="Previous frame">‹</button><button class="play-btn" id="play">Play</button><button aria-label="Next frame" id="next" title="Next frame">›</button><span class="mono" id="clock"></span><span class="spacer"></span><select aria-label="Playback speed" id="speed"><option value=".5">0.5×</option><option selected="" value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select><button id="toStop">Jump to stop</button></div>
+</div>
+<div class="mapbox"><div><h3>Executed path</h3><p class="muted">The arrow shows the recorded heading. Positions are relative to the stop.</p><p class="mono" id="pose"></p></div><canvas aria-label="Executed route and current robot pose" height="240" id="routeMap" width="640"></canvas></div>
+</section>
+<section class="panel" hidden="" id="stopPanel">
+<label class="field-title">Evidence frame <select id="viewSelect"></select></label>
+<div class="mini-tools"><button id="rgbBtn">RGB view</button><button id="depthBtn">Depth</button><button id="overlayBtn">Overlay</button></div>
+<div class="photo" id="inspectPhoto"><canvas aria-label="Stop or landmark pose on the route map" height="385" id="stopMap" width="800"></canvas><img alt="Selected stop or landmark evidence" id="inspectImage"/><canvas aria-hidden="true" height="480" id="overlay" width="640"></canvas></div>
+<p class="caption" id="inspectCaption"></p>
+<details class="details" id="markTools"><summary>Mark a problem or a better standing position</summary>
+<p>Click the image or enter its pixel coordinates. The original size is 640 × 480 with the origin at the top left.</p>
+<div class="mark-tools"><select aria-label="Marker type" id="markKind"><option value="issue">Issue</option><option value="stand">Standing position</option><option value="face">Operating face</option></select>
+<label>X <input id="markX" max="639" min="0" step="1" type="number"/></label><label>Y <input id="markY" max="479" min="0" step="1" type="number"/></label><button id="markAdd">Pin this point</button></div>
+</details>
+<details class="details"><summary>Read the stop audit</summary><p>The terminal base projection places both stops on the metal escalator entry plate. The marked point on the kiosk alone cannot certify a usable standing position.</p></details>
+</section>
+<section class="panel" hidden="" id="memoryPanel">
+<label class="field-title">Review question <select id="question"></select></label><h3 id="questionText"></h3>
+<div class="mini-tools" id="witnesses"></div><div class="photo"><canvas aria-label="Pose at the selected memory evidence frame" height="385" id="memoryMap" width="800"></canvas><img alt="First-person evidence for this question" id="questionImage"/></div>
+<p class="caption" id="questionCaption"></p>
+<details class="details" id="answerDetails"><summary>Show reference answer</summary><p id="answerText"></p></details>
+<button class="wide-link" id="watchContext">Replay from this frame <span aria-hidden="true">→</span></button>
+</section>
+</main>
+<aside aria-label="Human review form" class="review">
+<div class="review-heading"><h2 id="formName">Human review</h2><span class="tag" id="formStatus"></span></div>
+<p class="hint" id="formHint"></p><button class="wide-link" hidden="" id="rebase">Review the latest imported version</button><div id="checks"></div>
+<div class="evidence"><div class="between"><h3>Pinned evidence</h3><button class="text-btn" id="pin">+ Pin frame</button></div><ul id="pins"></ul></div>
+<label class="comment">Review notes<textarea id="note" maxlength="2000" placeholder="What supports your decision or needs more evidence?" rows="3"></textarea></label>
+<button class="primary" id="submit">Save review on this device</button><p aria-live="polite" id="formMessage" role="status"></p>
+</aside>
+</div>
+<dialog id="summary"><div class="summary-top"><h2>Review summary</h2><button aria-label="Close review summary" id="closeSummary">Close</button></div>
+<p class="hint">Compare the latest judgments from each reviewer. Exported records retain their revision history.</p>
+<div id="summaryBody"></div><button class="primary" id="exportAll">Export all saved reviews</button>
+</dialog>
+<div aria-live="polite" hidden="" id="toast" role="status"></div>
+<p aria-live="polite" hidden="" id="shareMsg" role="status"></p></body>
+</html>
