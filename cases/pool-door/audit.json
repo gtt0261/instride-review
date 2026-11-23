@@ -1,0 +1,27 @@
+{
+  "device": "NVIDIA RTX PRO 5000 72GB Blackwell",
+  "backend": "OPTIX",
+  "renderer": "5.2.0 LTS",
+  "floor_probes": 4536,
+  "floor_hits": 4536,
+  "target_at_stop": 9,
+  "target_reversed": 0,
+  "rays_per_target": 9,
+  "keys": {
+    "start": 0,
+    "turn": 201,
+    "approach": 469,
+    "stop": 503
+  },
+  "eye_height_u": 0.6545454545454547,
+  "camera_pitch_deg": -5,
+  "horizontal_fov_deg": 65,
+  "video_resolution": [
+    1920,
+    1080
+  ],
+  "still_resolution": [
+    3840,
+    2160
+  ]
+}

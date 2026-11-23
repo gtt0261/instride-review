@@ -1,0 +1,363 @@
+{
+  "schema": "instride-evaluation-candidates/1",
+  "status": "pending_human_review",
+  "route_limit_m": 40,
+  "scoring_draft": {
+    "H": "Enter the intended region",
+    "A": "Stop within 3 m traversable distance to the valid approach area",
+    "S": "Stop within 2 m of the intended part, face it and retain an unobstructed view"
+  },
+  "distance_basis": "Actual executed cylinder trajectory in each scene. The larger estimated scale must remain below the route limit.",
+  "cases": [
+    {
+      "id": "airport",
+      "route_id": "airport-fedex-concourse-hd",
+      "title": "Airport parcel counter",
+      "instruction": "Face the orange slot on the FedEx box.",
+      "region_name": "Airport parcel service area",
+      "target_label": "FedEx parcel drop box",
+      "target_body": "FedEx | deposit cabinet",
+      "target_part": "FedEx | hinged orange drawer",
+      "operative_surface": "Orange drop slot on the public side",
+      "stop_note": "Stop in front of the FedEx box facing its orange slot. The other parcel boxes are separate targets.",
+      "scene_id": "0a6c01ac3212768772f8f6eca86314c72d5ca320c3e3def148ddaceab23c07f4",
+      "scene_sha256": "71c9eb5b52d2034936fe54b82b39feaebc34fb3f80ee0f09af3654887d60f121",
+      "assets": "run/",
+      "scale_m_per_u": [
+        0.8,
+        0.95
+      ],
+      "length_scene_units": 30.77106844851623,
+      "length_m_range": [
+        24.616854758812984,
+        29.232515026090415
+      ],
+      "draft_region_xyxy": [
+        -3.7,
+        0.8,
+        1.7,
+        3.9
+      ],
+      "draft_approach_xyxy": [
+        -0.8,
+        2.38,
+        -0.04,
+        3.3
+      ],
+      "start_xy": [
+        -22.0,
+        -14.9
+      ],
+      "stop_xy": [
+        -0.432,
+        2.7
+      ],
+      "stop_yaw_deg": 90.0,
+      "no_stop_zones": [],
+      "geometric_checks": {
+        "region_entered": true,
+        "approach_distance_m": 0.0,
+        "distance_to_part_upper_m": 1.7243004146899688,
+        "clear_rays": 9,
+        "reversed_clear_rays": 0,
+        "collision_events": 0
+      },
+      "status": "pending_human_review"
+    },
+    {
+      "id": "bank-info-sign",
+      "route_id": "bank-info-sign",
+      "title": "Bank lobby",
+      "instruction": "Face the blue freestanding sign in the bank.",
+      "region_name": "Bank information area",
+      "target_label": "Blue freestanding information sign",
+      "target_body": "A-frame sign front leg",
+      "target_part": "A-frame blue information panel",
+      "operative_surface": "Printed front of the blue A-frame panel",
+      "stop_note": "Stop by the front of the freestanding blue sign. The wall-mounted signs and the narrow computer-kiosk aisle are separate destinations.",
+      "scene_id": "2a1439692acb6c9598d1e0a3bcfaf70cd289a0b38bbd0c1c3343a8120a1c02f6",
+      "scene_sha256": "ced602e364deb89e108e56d684297ee94b3f5e29b72883cae100108ed4a844f7",
+      "assets": "cases/bank-info-sign/",
+      "scale_m_per_u": [
+        0.48,
+        0.62
+      ],
+      "length_scene_units": 12.361408117442396,
+      "length_m_range": [
+        5.93347589637235,
+        7.664073032814286
+      ],
+      "draft_region_xyxy": [
+        -5.87,
+        1,
+        -2.7,
+        4.2
+      ],
+      "draft_approach_xyxy": [
+        -4.65333350499471,
+        1.8732750415802002,
+        -3.9866668383280435,
+        2.3732750415802
+      ],
+      "start_xy": [
+        6.5,
+        -3.8
+      ],
+      "stop_xy": [
+        -4.320000171661377,
+        2.1232750415802
+      ],
+      "stop_yaw_deg": 90.0,
+      "no_stop_zones": [],
+      "geometric_checks": {
+        "region_entered": true,
+        "approach_distance_m": 0.0,
+        "distance_to_part_upper_m": 1.4304690400285867,
+        "clear_rays": 9,
+        "reversed_clear_rays": 0,
+        "collision_events": 0
+      },
+      "status": "pending_human_review"
+    },
+    {
+      "id": "hotel-reception",
+      "route_id": "hotel-reception",
+      "title": "Hotel lobby",
+      "instruction": "Stop at the hotel reception counter.",
+      "region_name": "Reception area",
+      "target_label": "Hotel reception counter",
+      "target_body": "Reception counter",
+      "target_part": "Reception counter",
+      "operative_surface": "Lobby-facing front of the reception counter",
+      "stop_note": "Use the public lobby side of the counter. The staff side is outside the approach area.",
+      "scene_id": "c02acfbe324525d9c4080a8b4e273f9bb5a471545345a6bba0c464bfd7526acb",
+      "scene_sha256": "f332dbeb4af7533a71781bf6db383f9a0fcf4e3a441f1f74c2cbb26470144f44",
+      "assets": "cases/hotel-reception/",
+      "scale_m_per_u": [
+        0.5,
+        0.68
+      ],
+      "length_scene_units": 10.079807554358807,
+      "length_m_range": [
+        5.039903777179403,
+        6.854269136963989
+      ],
+      "draft_region_xyxy": [
+        -8.45,
+        -4.25,
+        -3.35,
+        -1.25
+      ],
+      "draft_approach_xyxy": [
+        -5.919999904632569,
+        -2.4850003623962404,
+        -5.279999904632568,
+        -2.00500036239624
+      ],
+      "start_xy": [
+        3.65,
+        -6.25
+      ],
+      "stop_xy": [
+        -5.599999904632568,
+        -2.2450003623962402
+      ],
+      "stop_yaw_deg": -90.0,
+      "no_stop_zones": [],
+      "geometric_checks": {
+        "region_entered": true,
+        "approach_distance_m": 0.0,
+        "distance_to_part_upper_m": 1.8160583080969772,
+        "clear_rays": 9,
+        "reversed_clear_rays": 0,
+        "collision_events": 0
+      },
+      "status": "pending_human_review"
+    },
+    {
+      "id": "library-computer",
+      "route_id": "library-computer",
+      "title": "Library",
+      "instruction": "Face the computer monitor at the library workstation.",
+      "region_name": "Library computer area",
+      "target_label": "Library computer workstation",
+      "target_body": "Desktop",
+      "target_part": "Computer monitor",
+      "operative_surface": "Monitor face above the keyboard",
+      "stop_note": "Stop in the aisle in front of the keyboard. The larger wall-mounted television is a different instance.",
+      "scene_id": "a3b5c19d6c07ed0b4e8b4438a8cca6f28cbc1b2eb46351289414616468523910",
+      "scene_sha256": "2f44238bdeb0515c70d1abcb9195a9bcb2af65bbeac9279fe3332e600d798a60",
+      "assets": "cases/library-computer/",
+      "scale_m_per_u": [
+        0.9,
+        1.1
+      ],
+      "length_scene_units": 13.164352343523495,
+      "length_m_range": [
+        11.847917109171146,
+        14.480787577875846
+      ],
+      "draft_region_xyxy": [
+        -6.3,
+        1.25,
+        -3.7,
+        3.4
+      ],
+      "draft_approach_xyxy": [
+        -5.07777787314521,
+        2.6880558649698894,
+        -4.722222317589654,
+        2.954722531636556
+      ],
+      "start_xy": [
+        5.9,
+        -2.15
+      ],
+      "stop_xy": [
+        -4.900000095367432,
+        2.8213891983032227
+      ],
+      "stop_yaw_deg": 90.0,
+      "no_stop_zones": [],
+      "geometric_checks": {
+        "region_entered": true,
+        "approach_distance_m": 0.0,
+        "distance_to_part_upper_m": 1.620700243785869,
+        "clear_rays": 9,
+        "reversed_clear_rays": 0,
+        "collision_events": 0
+      },
+      "status": "pending_human_review"
+    },
+    {
+      "id": "pool-door",
+      "route_id": "pool-door",
+      "title": "Indoor swimming pool",
+      "instruction": "Face the pull handle on the wooden poolside door.",
+      "region_name": "Poolside door landing",
+      "target_label": "Wooden poolside door",
+      "target_body": "Oak door leaf",
+      "target_part": "Stainless door pull",
+      "operative_surface": "Pool-deck side of the stainless pull handle",
+      "stop_note": "Keep the base on the tiled deck by the wooden door. The water and coping are blocked even at camera poses with a clear view.",
+      "scene_id": "a726c1112ad026efc92f59f196c0698e67abd12a04135a7ff6349b1d31b089eb",
+      "scene_sha256": "6fc2ad4827e07b89a1284e2d16cd71551fb207b2803e804a1a24570d5b7417ed",
+      "assets": "cases/pool-door/",
+      "scale_m_per_u": [
+        1.65,
+        2.2
+      ],
+      "length_scene_units": 9.230944718835218,
+      "length_m_range": [
+        15.231058786078108,
+        20.30807838143748
+      ],
+      "draft_region_xyxy": [
+        2.06,
+        1.15,
+        3.4,
+        2.38
+      ],
+      "draft_approach_xyxy": [
+        2.8446666500785134,
+        1.5130303173354178,
+        2.990121195533059,
+        1.7069697112748117
+      ],
+      "start_xy": [
+        -2.35,
+        -4.52
+      ],
+      "stop_xy": [
+        2.917393922805786,
+        1.6100000143051147
+      ],
+      "stop_yaw_deg": 0.0,
+      "no_stop_zones": [
+        {
+          "rect": [
+            -1.68,
+            -2.87,
+            1.55,
+            2.1
+          ],
+          "label": "Pool water and coping"
+        }
+      ],
+      "geometric_checks": {
+        "region_entered": true,
+        "approach_distance_m": 0.0,
+        "distance_to_part_upper_m": 1.57995993654463,
+        "clear_rays": 9,
+        "reversed_clear_rays": 0,
+        "collision_events": 0
+      },
+      "status": "pending_human_review"
+    },
+    {
+      "id": "station-terminal",
+      "route_id": "station-terminal",
+      "title": "Train station",
+      "instruction": "Face the service terminal on the station wall.",
+      "region_name": "Station services",
+      "target_label": "Station service terminal",
+      "target_body": "Station service terminal casing",
+      "target_part": "Station service terminal",
+      "operative_surface": "Public-facing terminal panel on the concourse wall",
+      "stop_note": "Use the level concourse in front of the terminal. The escalator opening is an excluded stopping area.",
+      "scene_id": "183dd248f6a86e07c5adf9de8ee2d0abe45b1216331c03678e89634c2e9b1c7f",
+      "scene_sha256": "44259890d8b65fc00c88de31893c639df870c11d968384d06a0905dc4d71017f",
+      "assets": "cases/station-terminal/",
+      "scale_m_per_u": [
+        1.2,
+        1.65
+      ],
+      "length_scene_units": 7.976460298526059,
+      "length_m_range": [
+        9.57175235823127,
+        13.161159492567997
+      ],
+      "draft_region_xyxy": [
+        3.05,
+        2.1,
+        6.28,
+        4.17
+      ],
+      "draft_approach_xyxy": [
+        4.516666762034098,
+        3.199166679382324,
+        4.783333428700765,
+        3.3991666793823243
+      ],
+      "start_xy": [
+        -3.3,
+        2.65
+      ],
+      "stop_xy": [
+        4.650000095367432,
+        3.299166679382324
+      ],
+      "stop_yaw_deg": 90.0,
+      "no_stop_zones": [
+        {
+          "rect": [
+            -3.67,
+            -0.91,
+            2.18,
+            1.2
+          ],
+          "label": "Escalator opening"
+        }
+      ],
+      "geometric_checks": {
+        "region_entered": true,
+        "approach_distance_m": 0.0,
+        "distance_to_part_upper_m": 1.7806837544545133,
+        "clear_rays": 9,
+        "reversed_clear_rays": 0,
+        "collision_events": 0
+      },
+      "status": "pending_human_review"
+    }
+  ]
+}

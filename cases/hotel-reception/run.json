@@ -1,0 +1,27 @@
+{
+  "status": "pending_human_review",
+  "device": "NVIDIA RTX PRO 5000 72GB Blackwell",
+  "gpu_index": 0,
+  "render_process_verified": true,
+  "peak_memory_mib": 4393,
+  "peak_utilization_percent": 98,
+  "video": {
+    "codec_name": "h264",
+    "width": 1920,
+    "height": 1080,
+    "r_frame_rate": "24/1",
+    "duration": "8.750000",
+    "nb_frames": "210"
+  },
+  "video_bytes": 13566871,
+  "video_sha256": "74c9bd4587d914651cbb52bd044c6ccc124c515223ab82ca471c726a93685ed1",
+  "render_source": "Task-local crop of the team's reconstructed mesh. Photo textures are represented by colors and coarse surface averages.",
+  "synchronized_observations": {
+    "frames": 210,
+    "width": 640,
+    "height": 360,
+    "spot_check_rays": 18,
+    "max_reference_mm_error": 0,
+    "stop_part_pixels": 75264
+  }
+}
