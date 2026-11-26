@@ -1,0 +1,72 @@
+{
+  "schema": "instride-review-media/1",
+  "cases": {
+    "airport": {
+      "source_revision": "f20d1ab56a0e55c61732027c68dcdcb5c3dd6dab3765f2983cfb98b88f0c41f9",
+      "key_frames": {
+        "start": 0,
+        "turn": 245,
+        "approach": 638,
+        "stop": 721,
+        "memory": 514,
+        "reverse": 721
+      },
+      "frame_count": 722
+    },
+    "bank-info-sign": {
+      "source_revision": "905bb55e1f3a59db1fb030e5da7f0af193bc92fee9288f06d964c5f501ab0a84",
+      "key_frames": {
+        "start": 0,
+        "turn": 104,
+        "approach": 148,
+        "stop": 214,
+        "reverse": 214
+      },
+      "frame_count": 215
+    },
+    "hotel-reception": {
+      "source_revision": "5ebf201d611a6f55e3f321735a274f806503d3e0db89568a3659c43ee11def68",
+      "key_frames": {
+        "start": 0,
+        "turn": 141,
+        "approach": 76,
+        "stop": 209,
+        "reverse": 209
+      },
+      "frame_count": 210
+    },
+    "library-computer": {
+      "source_revision": "aaf43a11dcbad64e6b32ce646c664aec0119e635ebfca1bde3e2b4b6be37bfae",
+      "key_frames": {
+        "start": 0,
+        "turn": 261,
+        "approach": 353,
+        "stop": 384,
+        "reverse": 384
+      },
+      "frame_count": 385
+    },
+    "pool-door": {
+      "source_revision": "0e88e2bd5cc97ca10ac72878c4cc6b5b528a83777b4b7a76993ced9500224aa1",
+      "key_frames": {
+        "start": 0,
+        "turn": 201,
+        "approach": 469,
+        "stop": 503,
+        "reverse": 503
+      },
+      "frame_count": 504
+    },
+    "station-terminal": {
+      "source_revision": "f48f69c5db0f351f1a0655a21872c8ff474f6a4ca78d0c06f158c763c78c5a31",
+      "key_frames": {
+        "start": 0,
+        "turn": 268,
+        "approach": 203,
+        "stop": 324,
+        "reverse": 324
+      },
+      "frame_count": 325
+    }
+  }
+}

@@ -1,50 +1,167 @@
 <!doctype html>
-<html lang="en"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#184c3e"><meta name="description" content="Review short expert robot routes and annotate usable and excluded stopping areas.">
-<title>InStride · Short route review</title>
-<link rel="stylesheet" href="airport.css"><script defer src="share.js"></script><script defer src="airport.js"></script>
-</head><body><header><div class="bar"><a class="brand" href="./"><span class="mark" aria-hidden="true">↗</span> InStride <span>Review</span></a><button id="copy" type="button">Copy link</button></div></header>
-<main>
-<nav class="case-nav" aria-label="Evaluation candidates"><div class="case-toolbar"><label for="case-select">Scene</label><select id="case-select"><option value="airport">Airport parcel counter</option></select><a href="evaluation-candidates.json">Candidate set JSON</a></div></nav>
-<div class="heading"><p id="case-status" class="eyebrow">Airport parcel counter · Human review pending</p><h1>Face the orange slot on the FedEx box.</h1>
-<p id="case-summary"></p></div>
-<div class="layout"><div class="primary-col">
-<section class="panel evidence"><div class="section-head"><h2>Robot camera</h2><span class="mode" id="mode">First-person RGB · 1080p</span></div>
-<div id="views" class="tabs" role="group" aria-label="Camera views">
-<button data-key="clip" aria-pressed="true">Full route</button><button data-key="start">Departure</button><button data-key="turn">Turn</button>
-<button data-key="approach">Approach</button><button data-key="stop">Final stop</button><button data-key="reverse">Reverse check</button></div>
-<figure><video id="film" width="1920" height="1080" controls playsinline preload="metadata" aria-label="First-person robot route"></video>
-<img id="hero" width="3840" height="2160" hidden alt=""><figcaption id="caption">Play the full route to follow the turns and final alignment.</figcaption></figure>
-<div class="file-row"><span id="clock" class="mode">Frame 0</span><a id="original" href="run/expert.mp4" target="_blank" rel="noopener">Open original video</a></div>
-</section>
-<section class="panel" id="memory" hidden><div class="section-head"><h2>Along-route memory</h2></div><p class="question">Which machine did you see earlier, outside the final view?</p>
-<div class="pair"><figure><a href="run/memory.jpg" target="_blank" rel="noopener"><img loading="lazy" src="run/memory.jpg" alt="Earlier view with the turquoise lottery machine"></a><figcaption id="earlier"></figcaption></figure>
-<figure><a href="run/stop.jpg" target="_blank" rel="noopener"><img loading="lazy" src="run/stop.jpg" alt="Final view facing the orange FedEx slot"></a><figcaption id="later"></figcaption></figure></div>
-<details><summary>Show the reference answer</summary><p>The turquoise lottery machine. The visibility check uses nine sight lines to its cabinet. This evidence supports a future memory test.</p></details>
-</section>
-<details class="panel methods"><summary>Run evidence and source</summary><p id="checks"></p><p id="renderInfo"></p>
-<p>The draft rubric checks entry into the intended region, a stop within 3 m of a traversable approach area, and a stop within 2 m of the intended part while facing it with a clear view.</p>
-<p id="render-source"></p>
-<p><a id="poses-link" href="run/trajectory.json">Executed poses and actions</a> · <a id="audit-link" href="run/audit.json">Floor and visibility checks</a> · <a id="receipt-link" href="run/run.json">Render receipt</a></p>
-<p>Scenes reconstructed from DL3DV. <a href="https://huggingface.co/datasets/DL3DV/DL3DV-GS-960P" rel="noreferrer">Source collection</a> · <a href="https://github.com/DL3DV-10K/Dataset/blob/main/License.md" rel="noreferrer">Source terms</a></p></details>
-</div><aside class="secondary-col">
-<section class="panel stop-criteria"><h2>What counts as a valid stop?</h2>
-<dl><dt>Target</dt><dd id="target-label"></dd><dt>Operating side</dt><dd id="target-side"></dd></dl>
-<p class="footnote" id="stop-note"></p><p class="footnote" id="draft-score"></p></section>
-<section class="panel"><div class="section-head"><h2>Where the robot goes</h2><span class="mode">Top view</span></div>
-<div class="tabs" role="group" aria-label="Map detail"><button id="wide" aria-pressed="true">Entire route</button><button id="close" aria-pressed="false">Stop area</button></div>
-<canvas id="map" width="880" height="640" role="img" aria-label="Top view with the route, current position, heading and draft approach area"></canvas>
-<div class="legend"><span><i class="route"></i>Executed path</span><span><i class="zone"></i>Task region</span><span><i class="area"></i>Draft approach area</span><span><i class="hazard"></i>No-stop zone</span></div>
-<div class="review-tools"><button id="pick" aria-pressed="false">Draw approach area</button><button id="block" aria-pressed="false">Mark no-stop zone</button><button id="restore">Reset draft</button></div>
-<details><summary>Edit coordinates</summary><div class="coords"><label>Min X<input id="x0" type="number" step="0.01"></label><label>Min Y<input id="y0" type="number" step="0.01"></label><label>Max X<input id="x1" type="number" step="0.01"></label><label>Max Y<input id="y1" type="number" step="0.01"></label></div>
-<button id="apply">Preview area</button><p class="footnote">Coordinates are in scene units.</p></details><p id="mapStatus" class="footnote" role="status"></p></section>
-<section class="panel"><h2>Review this stop</h2><label>Reviewer alias<input id="who" placeholder="Name or initials" maxlength="40" autocomplete="off"></label>
-<fieldset class="review-checks"><legend>Confirm against the video and the map</legend>
-<label><input id="verify-target" type="checkbox">The instruction identifies one target.</label>
-<label><input id="verify-area" type="checkbox">The base can stand in the marked area.</label>
-<label><input id="verify-face" type="checkbox">The stop faces the intended part with a clear view.</label></fieldset>
-<label>Decision<select id="decision"><option value="pending">Select a decision</option><option value="accept">Accept proposed stop</option><option value="revise">Request a revision</option><option value="insufficient_evidence">Insufficient evidence</option></select></label>
-<label>Review notes<textarea id="note" rows="2" maxlength="2000" placeholder="What supports your decision?"></textarea></label>
-<button class="action" id="save">Export review JSON</button><p id="msg" class="footnote" role="status">Export your review to share it with the team.</p></section>
-</aside></div></main><footer>InStride · Short route review</footer><p id="shareMsg" role="status" aria-live="polite" hidden></p></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#184c3e">
+  <meta name="description" content="Review candidate navigation targets, reachable approach areas, and expert trajectory evidence.">
+  <title>InStride · Expert data review</title>
+  <link rel="stylesheet" href="airport.css?v=2">
+  <script defer src="playback.js?v=2"></script>
+  <script defer src="reviews.js?v=2"></script>
+  <script defer src="airport.js?v=2"></script>
+  <script defer src="share.js?v=2"></script>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <a class="brand" href="./"><span class="mark" aria-hidden="true">↗</span> InStride <span>Review</span></a>
+      <button id="copy" type="button">Copy link</button>
+    </div>
+  </header>
+  <main>
+    <nav class="case-nav" aria-label="Review queue">
+      <div class="case-toolbar">
+        <label for="case-select">Scene</label>
+        <select id="case-select" disabled></select>
+        <a href="evaluation-candidates.json">Candidate set JSON</a>
+      </div>
+    </nav>
+    <div class="heading">
+      <p id="case-status" class="eyebrow" aria-live="polite"></p>
+      <h1>Expert data review</h1>
+      <p id="case-summary"></p>
+      <p id="case-error" class="footnote" role="status" hidden></p>
+    </div>
+    <div class="layout" id="case-content" hidden>
+      <div class="primary-col">
+        <section class="panel evidence">
+          <div class="section-head">
+            <h2>Robot camera</h2>
+            <label class="quality" for="quality">Video quality
+              <select id="quality">
+                <option value="auto">Auto</option>
+                <option value="540">540p</option>
+                <option value="1080">1080p</option>
+              </select>
+            </label>
+          </div>
+          <div id="views" class="tabs" role="group" aria-label="Camera views">
+            <button data-key="clip" aria-pressed="true">Full route</button>
+            <button data-key="start">Departure</button>
+            <button data-key="turn">Turn</button>
+            <button data-key="approach">Approach</button>
+            <button data-key="stop">Final stop</button>
+            <button data-key="reverse">Reverse check</button>
+          </div>
+          <figure>
+            <div class="player-shell">
+              <video id="film" width="1920" height="1080" controls playsinline muted preload="none" aria-label="First-person robot route"></video>
+              <img id="hero" width="1120" height="630" decoding="async" hidden alt="">
+              <button class="play-route" id="start-playback" type="button">Play route</button>
+            </div>
+            <figcaption id="caption" aria-live="polite"></figcaption>
+          </figure>
+          <div class="file-row">
+            <span id="clock" class="mode"></span>
+            <span id="mode" class="mode"></span>
+            <a id="original" target="_blank" rel="noopener">Open original video</a>
+          </div>
+        </section>
+        <details class="panel" id="memory" hidden>
+          <summary>Along-route memory evidence</summary>
+          <p class="question">Which machine did the robot see earlier, outside the final view?</p>
+          <div class="pair">
+            <figure><a id="earlier-link" target="_blank" rel="noopener"><img id="earlier-image" width="1120" height="630" loading="lazy" decoding="async" alt="Earlier view with the turquoise lottery machine"></a><figcaption id="earlier"></figcaption></figure>
+            <figure><a id="later-link" target="_blank" rel="noopener"><img id="later-image" width="1120" height="630" loading="lazy" decoding="async" alt="Final view facing the orange FedEx slot"></a><figcaption id="later"></figcaption></figure>
+          </div>
+          <details><summary>Show the reference answer</summary><p>The turquoise lottery machine.</p></details>
+        </details>
+        <details class="panel methods" id="run-evidence">
+          <summary>Run evidence and source</summary>
+          <p id="checks"></p>
+          <p id="renderInfo"></p>
+          <p id="render-source"></p>
+          <dl class="source-ids">
+            <dt>Scene ID</dt><dd id="scene-id"></dd>
+            <dt>Route ID</dt><dd id="route-id"></dd>
+            <dt>Evidence revision</dt><dd id="source-revision"></dd>
+          </dl>
+          <p><a id="poses-link">Executed poses and actions</a> · <a id="audit-link">Floor and visibility checks</a> · <a id="receipt-link">Render receipt</a></p>
+          <p>Scenes reconstructed from DL3DV. <a href="https://huggingface.co/datasets/DL3DV/DL3DV-GS-960P" rel="noreferrer">Source collection</a> · <a href="https://github.com/DL3DV-10K/Dataset/blob/main/License.md" rel="noreferrer">Source terms</a></p>
+        </details>
+      </div>
+      <aside class="secondary-col">
+        <section class="panel stop-criteria">
+          <h2>Target and approach area</h2>
+          <dl>
+            <dt>Target</dt><dd id="target-label"></dd>
+            <dt>Part</dt><dd id="target-part"></dd>
+            <dt>Operating side</dt><dd id="target-side"></dd>
+          </dl>
+          <p class="footnote" id="stop-note"></p>
+          <details>
+            <summary>Recorded route checks</summary>
+            <p class="footnote" id="draft-score"></p>
+          </details>
+        </section>
+        <section class="panel">
+          <div class="section-head"><h2>Where the robot goes</h2><span class="mode">Top view · scene units</span></div>
+          <div class="tabs" role="group" aria-label="Map detail">
+            <button id="wide" aria-pressed="true">Entire route</button>
+            <button id="close" aria-pressed="false">Stop area</button>
+          </div>
+          <div class="route-map">
+            <canvas id="map" width="880" height="640" role="img" aria-label="Top view with the route, target, current heading, and approach area"></canvas>
+            <canvas id="map-marker" width="880" height="640" aria-hidden="true"></canvas>
+          </div>
+          <div class="legend">
+            <span><i class="route"></i>Executed path</span><span><i class="zone"></i>Task region</span>
+            <span><i class="area"></i>Approach area</span><span><i class="hazard"></i>No-stop zone</span>
+            <span><i class="target"></i>Target</span><span><i class="heading-marker"></i>Current heading</span>
+          </div>
+          <div class="review-tools">
+            <button id="pick" aria-pressed="false">Draw approach area</button>
+            <button id="block" aria-pressed="false">Mark no-stop zone</button>
+            <button id="restore">Reset draft</button>
+          </div>
+          <details>
+            <summary>Edit coordinates</summary>
+            <div class="coords">
+              <label>Min X<input id="x0" type="number" step="any"></label><label>Min Y<input id="y0" type="number" step="any"></label>
+              <label>Max X<input id="x1" type="number" step="any"></label><label>Max Y<input id="y1" type="number" step="any"></label>
+            </div>
+            <button id="apply">Preview area</button>
+          </details>
+          <p id="mapStatus" class="footnote" role="status"></p>
+        </section>
+        <section class="panel">
+          <div class="section-head"><h2>Annotation review</h2><span id="review-state" class="review-state" role="status">Pending review</span></div>
+          <p id="review-scope" class="footnote"></p>
+          <form id="review-form">
+            <label>Reviewer alias<input id="who" placeholder="Name or initials" maxlength="40" autocomplete="off"></label>
+            <fieldset class="review-checks">
+              <legend>Check the target and reachable area</legend>
+              <label><input id="verify-target" type="checkbox">The instruction identifies the marked target and operating part.</label>
+              <label><input id="verify-area" type="checkbox">The robot can reach the marked area and stand there clear of hazards.</label>
+            </fieldset>
+            <label>Decision
+              <select id="decision">
+                <option value="">Select a decision</option>
+                <option value="approve">Approve</option>
+                <option value="request_changes">Request changes</option>
+              </select>
+            </label>
+            <label>Review notes<textarea id="note" rows="2" maxlength="2000" placeholder="For a change request, identify the target or area and explain what needs fixing."></textarea></label>
+            <button class="action" id="save" type="submit">Save review</button>
+            <p id="msg" class="footnote" role="status"></p>
+          </form>
+          <details id="review-history" hidden><summary>Review history</summary><ol id="history"></ol></details>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <footer>InStride · Expert data review</footer>
+  <p id="shareMsg" role="status" aria-live="polite" hidden></p>
+</body>
+</html>
