@@ -55,13 +55,26 @@ async function playback(page, base) {
     await page.locator('#case-content').waitFor();
     assert.equal(await page.locator('h1').textContent(), entry.instruction);
     assert.equal(await page.locator('#target-part').textContent(), entry.target_part);
+    assert.match(await page.locator('#final-heading').textContent(), /° from \+X toward \+Y/);
     await page.locator('#start-playback').click();
     await waitForPlay(page, 960);
     await page.locator('#film').evaluate(film => {
       film.pause();
       film.currentTime = 2;
     });
-    await page.waitForFunction(() => document.getElementById('clock').textContent.includes('Frame 48 /'));
+    const route = JSON.parse(readFileSync(join(root, entry.assets, 'trajectory.json')));
+    const indexAtTwo = route.frame_control_steps
+      ? route.frame_control_steps.filter(step => step <= 2 * route.frame_time_hz).length - 1
+      : 2 * route.fps;
+    await page.waitForFunction(frame => document.getElementById('clock').textContent.includes('Frame ' + frame + ' /'), indexAtTwo);
+    if (route.frame_control_steps && route.frame_control_steps.at(-1) % 2) {
+      const stopTime = route.frame_control_steps.at(-1) / route.frame_time_hz;
+      for (const [time, expected] of [[stopTime - .02, route.frames.length - 2],
+        [stopTime, route.frames.length - 1]]) {
+        await page.locator('#film').evaluate((film, timestamp) => { film.currentTime = timestamp; }, time);
+        await page.waitForFunction(frame => document.getElementById('clock').textContent.startsWith('Frame ' + frame + ' /'), expected);
+      }
+    }
     await page.locator('[data-key="stop"]').click();
     const preview = await page.locator('#hero').evaluate(async image => {
       await image.decode();
@@ -71,15 +84,21 @@ async function playback(page, base) {
     assert.match(await page.locator('#clock').textContent(), new RegExp(
       'Frame ' + evidence[entry.id].key_frames.stop + ' /'));
     assert.match(await page.locator('#original').getAttribute('href'), /stop\.jpg\?v=/);
+    if (route.frame_control_steps) {
+      assert.equal(route.frame_control_steps.length, route.frames.length);
+      assert(entry.length_m_range[0] >= 20 && entry.length_m_range[1] <= 40);
+      assert.match(await page.locator('#clock').textContent(), new RegExp(
+        (route.frame_control_steps.at(-1) / route.frame_time_hz).toFixed(2) + ' s'));
+    }
   }
   assert.equal(await page.evaluate(() => performance.getEntriesByType('navigation').length), 1);
-  assert.equal(new URL(page.url()).searchParams.get('case'), 'station-terminal');
+  assert.equal(new URL(page.url()).searchParams.get('case'), candidates.at(-1).id);
   await page.goBack();
   await page.locator('#case-content').waitFor();
-  assert.equal(await page.locator('#case-select').inputValue(), 'pool-door');
+  assert.equal(await page.locator('#case-select').inputValue(), candidates.at(-2).id);
   await page.locator('#copy').click();
   assert.equal(await page.evaluate(() => navigator.clipboard.readText()), page.url());
-  console.log('Six scenes: deferred media, 540p playback, seeking, STOP frames, same-page switching and share links passed.');
+  console.log(candidates.length + ' scenes: deferred media, 540p playback, seeking, STOP frames, same-page switching and share links passed.');
 }
 
 async function changeQuality(page) {
@@ -137,7 +156,7 @@ async function autoFallback(browser, base) {
 async function review(page, base, reviews) {
   const url = new URL(base);
   url.searchParams.set('case', 'pool-door');
-  await page.goto(url.href);
+  await page.goto(url.href, { waitUntil: 'domcontentloaded' });
   await page.locator('#case-content').waitFor();
   await page.locator('[data-key="stop"]').click();
   await page.locator('#who').fill('Smoke Reviewer');
@@ -194,7 +213,7 @@ async function review(page, base, reviews) {
     assert.equal(approval.evidence_locator.frame_index, evidence['pool-door'].key_frames.stop);
   }
 
-  await page.reload();
+  await page.reload({ waitUntil: 'domcontentloaded' });
   await page.getByText(visibleState, { exact: true }).waitFor();
   await page.locator('[data-key="stop"]').click();
   await page.locator('#hero').evaluate(image => image.decode());
@@ -232,6 +251,7 @@ async function main() {
     await page.goto(base);
     await page.locator('#case-content').waitFor();
     await changeQuality(page);
+    await page.locator('#film').evaluate(film => film.pause());
     await review(page, base, reviews);
     assert.deepEqual(errors, []);
     if (!remote) await autoFallback(browser, base);

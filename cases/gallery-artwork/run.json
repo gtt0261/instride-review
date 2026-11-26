@@ -1,0 +1,22 @@
+{
+  "renderer": "Isaac Sim RTX",
+  "isaacsim_version": "6.2.0.0",
+  "execution_backend": "Newton selected; query-only kinematic cylinder",
+  "solver": "XPBD",
+  "graphics_gpu": 7,
+  "camera_render_px": [
+    1440,
+    1080
+  ],
+  "stills_render_px": [
+    2880,
+    2160
+  ],
+  "camera_frames": 472,
+  "authored_lights": 21,
+  "camera_fill_intensity": 130.0,
+  "supplemental_ceiling_lights": 11,
+  "render_source": "Isaac Sim RTX rendered the recorded camera poses. The 4:3 video is shown in a 1080p frame. The 4K stills use the same camera poses. Supplemental lights were placed in the capture session to illuminate the indoor geometry.",
+  "decoded_video_frames": 472,
+  "video_sha256": "14126581797a13ab27bb998da49be83a47aa538e1e1ec24be90f948adbb92b05"
+}

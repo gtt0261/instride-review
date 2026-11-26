@@ -6,11 +6,11 @@
   <meta name="theme-color" content="#184c3e">
   <meta name="description" content="Review candidate navigation targets, reachable approach areas, and expert trajectory evidence.">
   <title>InStride · Expert data review</title>
-  <link rel="stylesheet" href="airport.css?v=2">
-  <script defer src="playback.js?v=2"></script>
-  <script defer src="reviews.js?v=2"></script>
-  <script defer src="airport.js?v=2"></script>
-  <script defer src="share.js?v=2"></script>
+  <link rel="stylesheet" href="airport.css?v=3">
+  <script defer src="playback.js?v=3"></script>
+  <script defer src="reviews.js?v=3"></script>
+  <script defer src="airport.js?v=3"></script>
+  <script defer src="share.js?v=3"></script>
 </head>
 <body>
   <header>
@@ -98,6 +98,8 @@
             <dt>Target</dt><dd id="target-label"></dd>
             <dt>Part</dt><dd id="target-part"></dd>
             <dt>Operating side</dt><dd id="target-side"></dd>
+            <dt>Final heading</dt><dd id="final-heading"></dd>
+            <dt id="final-pitch-label" hidden>Camera pitch</dt><dd id="final-pitch" hidden></dd>
           </dl>
           <p class="footnote" id="stop-note"></p>
           <details>
@@ -106,7 +108,7 @@
           </details>
         </section>
         <section class="panel">
-          <div class="section-head"><h2>Where the robot goes</h2><span class="mode">Top view · scene units</span></div>
+          <div class="section-head"><h2>Where the robot goes</h2><span class="mode" id="map-units">Top view</span></div>
           <div class="tabs" role="group" aria-label="Map detail">
             <button id="wide" aria-pressed="true">Entire route</button>
             <button id="close" aria-pressed="false">Stop area</button>

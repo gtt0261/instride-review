@@ -1,0 +1,58 @@
+{
+  "keys": {
+    "start": 0,
+    "turn": 48,
+    "approach": 525,
+    "stop": 586
+  },
+  "floor_probes": 1171,
+  "floor_hits": 1171,
+  "target_at_stop": 1,
+  "target_reversed": 0,
+  "rays_per_target": 1,
+  "object_stop": {
+    "passed": true,
+    "distance_m": 1.8309560344251592,
+    "in_image": true,
+    "line_of_sight": true,
+    "aim_px": [
+      319.99999999999994,
+      240.0
+    ],
+    "angle_deg": 0.0,
+    "within_30_deg": true,
+    "first_hit_prim": "/root/Covered_billiard_table_006/Draped_cushion_cover_006"
+  },
+  "stop": {
+    "decision": "STOP",
+    "decision_sim_s": 58.55,
+    "control_steps": 1171,
+    "frame_index": 586,
+    "pose": {
+      "x_m": -0.10000000000002451,
+      "y_m": 27.120000000000626,
+      "yaw_rad": 1.1902899496823922,
+      "pitch_rad": -0.1878243348228886
+    }
+  },
+  "scores": {
+    "H": true,
+    "A": true,
+    "S": true,
+    "success": true,
+    "approach_distance_m": 0.0,
+    "object_stop": {
+      "passed": true,
+      "distance_m": 1.8309560344251592,
+      "in_image": true,
+      "line_of_sight": true,
+      "aim_px": [
+        319.99999999999994,
+        240.0
+      ],
+      "angle_deg": 0.0,
+      "within_30_deg": true,
+      "first_hit_prim": "/root/Covered_billiard_table_006/Draped_cushion_cover_006"
+    }
+  }
+}

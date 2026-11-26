@@ -1,4 +1,4 @@
-function openPlayback(entry, source, fps, asset, onFrame, signal) {
+function openPlayback(entry, source, route, asset, onFrame, signal) {
   const film = $('film');
   const still = $('hero');
   const play = $('start-playback');
@@ -19,6 +19,7 @@ function openPlayback(entry, source, fps, asset, onFrame, signal) {
   let waitTimer;
   let streamAbort;
   let autoFallback = false;
+  const times = route.frame_control_steps?.map(step => step / route.frame_time_hz);
 
   quality.value = loadPreference('instride-video-quality', 'auto');
   if (!quality.value) quality.value = 'auto';
@@ -45,13 +46,24 @@ function openPlayback(entry, source, fps, asset, onFrame, signal) {
     if (next === frame && !force) return;
     frame = next;
     $('clock').textContent = 'Frame ' + frame + ' / ' + (source.frame_count - 1)
-      + ' · ' + (frame / fps).toFixed(2) + ' s';
+      + ' · ' + (times?.[frame] ?? frame / route.fps).toFixed(2) + ' s';
     onFrame(frame, view);
   }
 
   function synchronize(force = false) {
     if (view !== 'clip') return;
-    const index = Math.floor((film.readyState ? film.currentTime : previousTime) * fps + 0.0001);
+    const seconds = (film.readyState ? film.currentTime : previousTime) + 0.0001;
+    let index = Math.floor(seconds * route.fps);
+    if (times) {
+      let low = 0;
+      let high = times.length;
+      while (low < high) {
+        const middle = Math.floor((low + high) / 2);
+        if (times[middle] <= seconds) low = middle + 1;
+        else high = middle;
+      }
+      index = low - 1;
+    }
     showFrame(Math.min(source.frame_count - 1, Math.max(0, index)), force);
   }
 

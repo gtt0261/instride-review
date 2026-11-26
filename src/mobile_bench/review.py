@@ -276,6 +276,7 @@ class ReviewStore:
                     "source_revision": revision, "review_id": review["review_id"],
                     "instruction": entry["instruction"], "target_part": entry["target_part"],
                     "approach_area_xyxy_u": route["area"],
+                    "collection_input_revision": entry.get("collection_input_revision"),
                 })
             except ReviewError as error:
                 blocked.append({"case_id": case_id, "state": "evidence_unavailable", "reason": str(error)})

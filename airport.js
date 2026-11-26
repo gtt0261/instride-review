@@ -114,6 +114,19 @@ function openMap(entry, route, draft, signal) {
     }
     rectangle(route.zone, '#dcead3', '#8ba682');
     for (const solid of route.map_solids) rectangle(solid.rect, '#b1bbb0', '#929e94');
+    ctx.fillStyle = '#b1bbb0';
+    ctx.strokeStyle = '#929e94';
+    ctx.lineWidth = 1.2;
+    for (const polygon of route.map_obstacles ?? []) {
+      ctx.beginPath();
+      for (const ring of polygon) {
+        ctx.moveTo(...xy(...ring[0]));
+        for (const corner of ring.slice(1)) ctx.lineTo(...xy(...corner));
+        ctx.closePath();
+      }
+      ctx.fill('evenodd');
+      ctx.stroke();
+    }
     for (const zone of hazards) rectangle(zone.rect, '#dc8f7877', '#a24738');
     for (const rect of proposedZones) rectangle(rect, '#cf6e547f', '#a42d21');
     rectangle(route.area, '#82b9a2aa', '#266248');
@@ -356,7 +369,7 @@ function showError(message) {
 
 async function ready() {
   const [catalog, media] = await Promise.all([
-    fetchJSON('evaluation-candidates.json'), fetchJSON('review-media.json?v=2'),
+    fetchJSON('evaluation-candidates.json?v=3'), fetchJSON('review-media.json?v=3'),
   ]);
   const entries = new Map(catalog.cases.map(entry => [entry.id, entry]));
   const choose = $('case-select');
@@ -386,17 +399,29 @@ async function ready() {
     setState('loading');
     document.querySelector('h1').textContent = entry.instruction;
     document.title = entry.title + ' · InStride Review';
-    $('case-summary').textContent = entry.region_name + ' · '
-      + entry.length_m_range.map(value => value.toFixed(1)).join('–') + ' m estimated';
+    const [near, far] = entry.length_m_range;
+    $('case-summary').textContent = entry.region_name + ' · ' + (near === far
+      ? near.toFixed(2) + ' m executed' : near.toFixed(1) + '–' + far.toFixed(1) + ' m estimated');
     const scores = entry.geometric_checks;
     $('target-label').textContent = entry.target_label;
     $('target-part').textContent = entry.target_part;
     $('target-side').textContent = entry.operative_surface;
+    const yaw = (entry.stop_yaw_deg % 360 + 360) % 360;
+    $('final-heading').textContent = yaw.toFixed(1) + '° from +X toward +Y';
+    const recordedPitch = typeof entry.stop_pitch_deg === 'number';
+    $('final-pitch-label').hidden = !recordedPitch;
+    $('final-pitch').hidden = !recordedPitch;
+    if (recordedPitch) {
+      const pitch = entry.stop_pitch_deg;
+      $('final-pitch').textContent = Math.abs(pitch).toFixed(1) + '° ' + (pitch < 0 ? 'down' : 'up');
+    }
+    $('map-units').textContent = 'Top view · ' + (entry.coordinate_unit === 'm' ? 'meters' : 'scene units');
     $('stop-note').textContent = entry.stop_note;
     $('draft-score').textContent = (scores.region_entered ? 'Region entered' : 'Region missed') + ' · '
       + scores.approach_distance_m.toFixed(1) + ' m to the draft approach area · '
       + scores.distance_to_part_upper_m.toFixed(2) + ' m to the part at the upper scale estimate · '
-      + scores.clear_rays + ' clear sight lines · ' + scores.collision_events + ' collisions';
+      + scores.clear_rays + ' clear sight ' + (scores.clear_rays === 1 ? 'line' : 'lines')
+      + ' · ' + scores.collision_events + ' collision steps';
 
     try {
       if (!source) throw Error('The review index is missing this scene.');
@@ -407,7 +432,7 @@ async function ready() {
       }
       $('case-content').hidden = false;
       const map = openMap(entry, route, drafts.get(draftKey), signal);
-      const player = openPlayback(entry, source, route.fps, asset, map.locate, signal);
+      const player = openPlayback(entry, source, route, asset, map.locate, signal);
       openRunEvidence(entry, route, source, asset, signal);
       openReviewForm(entry, source, route, map, player, setState, signal);
       signal.addEventListener('abort', () => drafts.set(draftKey, map.draft()), { once: true });

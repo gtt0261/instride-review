@@ -1,0 +1,58 @@
+{
+  "keys": {
+    "start": 0,
+    "turn": 229,
+    "approach": 378,
+    "stop": 471
+  },
+  "floor_probes": 942,
+  "floor_hits": 942,
+  "target_at_stop": 1,
+  "target_reversed": 0,
+  "rays_per_target": 1,
+  "object_stop": {
+    "passed": true,
+    "distance_m": 1.5707375423009702,
+    "in_image": true,
+    "line_of_sight": true,
+    "aim_px": [
+      320.00000000000017,
+      240.0
+    ],
+    "angle_deg": 0.0,
+    "within_30_deg": true,
+    "first_hit_prim": "/root/exhibit_right_5_panel/Cube_075"
+  },
+  "stop": {
+    "decision": "STOP",
+    "decision_sim_s": 47.1,
+    "control_steps": 942,
+    "frame_index": 471,
+    "pose": {
+      "x_m": 9.649999999999928,
+      "y_m": 0.08999999999998298,
+      "yaw_rad": 1.357824335351708,
+      "pitch_rad": 0.3704253616847134
+    }
+  },
+  "scores": {
+    "H": true,
+    "A": true,
+    "S": true,
+    "success": true,
+    "approach_distance_m": 0.0,
+    "object_stop": {
+      "passed": true,
+      "distance_m": 1.5707375423009702,
+      "in_image": true,
+      "line_of_sight": true,
+      "aim_px": [
+        320.00000000000017,
+        240.0
+      ],
+      "angle_deg": 0.0,
+      "within_30_deg": true,
+      "first_hit_prim": "/root/exhibit_right_5_panel/Cube_075"
+    }
+  }
+}

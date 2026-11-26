@@ -67,6 +67,28 @@
         "reverse": 324
       },
       "frame_count": 325
+    },
+    "gallery-artwork": {
+      "source_revision": "40b5eb2bcaa1498544e18054a81a2cc70112e5dcabf265201ba63488e0377ec2",
+      "key_frames": {
+        "start": 0,
+        "turn": 229,
+        "approach": 378,
+        "stop": 471,
+        "reverse": 471
+      },
+      "frame_count": 472
+    },
+    "billiards-table": {
+      "source_revision": "a72b85267cefe630c46960932571a1bfe8d31b9cff2d07b73f148dcebbc67114",
+      "key_frames": {
+        "start": 0,
+        "turn": 48,
+        "approach": 525,
+        "stop": 586,
+        "reverse": 586
+      },
+      "frame_count": 587
     }
   }
 }

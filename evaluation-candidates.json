@@ -358,6 +358,106 @@
         "collision_events": 0
       },
       "status": "pending_human_review"
+    },
+    {
+      "id": "gallery-artwork",
+      "route_id": "gallery-artwork-bb48ad506a89",
+      "title": "Art gallery",
+      "instruction": "Face the artwork at the east end of the gallery.",
+      "region_name": "East end of the main gallery",
+      "target_label": "Last artwork on the long gallery wall",
+      "target_part": "Front of the easternmost framed artwork",
+      "operative_surface": "The viewing area on the gallery side",
+      "stop_note": "Stop on the main gallery floor and face the final framed piece near the east wall.",
+      "scene_id": "dl3dv-indoor-dcc9d67f2f14",
+      "scene_sha256": "52fedb53622dd742dfe6dcba7607653c49245b8f8fccbe4d761fb1cc9d8edc8d",
+      "collection_input_revision": "bb48ad506a89d8af0cea461e28e005d5bc4d6db68e0e353703f4cf27bd1d9c5f",
+      "assets": "cases/gallery-artwork/",
+      "length_m_range": [
+        20.807906292518776,
+        20.807906292518776
+      ],
+      "draft_region_xyxy": [
+        8.65,
+        -1.5,
+        10.38,
+        1.57
+      ],
+      "draft_approach_xyxy": [
+        9.6,
+        0.04,
+        10.06,
+        0.3
+      ],
+      "start_xy": [
+        -0.050000000000038014,
+        12.58999999999994
+      ],
+      "stop_xy": [
+        9.649999999999928,
+        0.08999999999998298
+      ],
+      "stop_yaw_deg": 77.79760373580902,
+      "stop_pitch_deg": 21.223809849141112,
+      "coordinate_unit": "m",
+      "geometric_checks": {
+        "region_entered": true,
+        "approach_distance_m": 0.0,
+        "distance_to_part_upper_m": 1.5707375423009702,
+        "clear_rays": 1,
+        "collision_events": 0
+      },
+      "status": "pending_human_review"
+    },
+    {
+      "id": "billiards-table",
+      "route_id": "billiards-table-e007d7fec272",
+      "title": "Billiards hall",
+      "instruction": "Face the angled covered table at the far end.",
+      "region_name": "Far billiards bay",
+      "target_label": "Angled covered billiard table",
+      "target_part": "Near side of the angled table's cloth cover",
+      "operative_surface": "The aisle on the near side of the covered table",
+      "stop_note": "Stop in the aisle before the angled covered table and face its near edge. Keep the base outside the table footprint.",
+      "scene_id": "dl3dv-indoor-4f0d6f7cf266",
+      "scene_sha256": "9fe6bd9bbfe1c6d31706b7506c6f58a9cd7fa2657f64fef99a68e8699dd0b853",
+      "collection_input_revision": "e007d7fec27210987bd79ee433e2212836b12863799874512f1346bc65b5458a",
+      "assets": "cases/billiards-table/",
+      "length_m_range": [
+        26.421727660379275,
+        26.421727660379275
+      ],
+      "draft_region_xyxy": [
+        -2.15,
+        25.6,
+        3.15,
+        30.25
+      ],
+      "draft_approach_xyxy": [
+        -0.14,
+        27.1,
+        1.1,
+        27.43
+      ],
+      "start_xy": [
+        -2.4000000000000163,
+        2.120000000000271
+      ],
+      "stop_xy": [
+        -0.10000000000002451,
+        27.120000000000626
+      ],
+      "stop_yaw_deg": 68.1985905136402,
+      "stop_pitch_deg": -10.761541675203576,
+      "coordinate_unit": "m",
+      "geometric_checks": {
+        "region_entered": true,
+        "approach_distance_m": 0.0,
+        "distance_to_part_upper_m": 1.8309560344251592,
+        "clear_rays": 1,
+        "collision_events": 0
+      },
+      "status": "pending_human_review"
     }
   ]
 }
